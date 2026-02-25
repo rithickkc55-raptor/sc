@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Multi Layer Disaster Prediction and Prevention AI Intelligence System</title>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+<style>
+body{
+background:#0f172a;
+color:white;
+font-family:Arial;
+text-align:center;
+}
+.card{
+background:#1e293b;
+margin:20px;
+padding:20px;
+border-radius:10px;
+}
+.alert{
+color:red;
+font-size:24px;
+}
+.safe{
+color:lime;
+font-size:24px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Multi-Layer Disaster Intelligence System</h1>
+
+<div class="card">
+<h2>Water Level: <span id="water">Loading...</span></h2>
+<h2>Rain: <span id="rain">Loading...</span></h2>
+<h2>Temperature: <span id="temp">Loading...</span></h2>
+<h2>Humidity: <span id="hum">Loading...</span></h2>
+</div>
+
+<div class="card">
+<h2>AI Flood Risk: <span id="risk">Calculating...</span>%</h2>
+<h2 id="status">Status: Analyzing</h2>
+</div>
+
+<div class="sketchfab-embed-wrapper"> <iframe title="City 1" frameborder="0" allowfullscreen mozallowfullscreen="true" webkitallowfullscreen="true" allow="autoplay; fullscreen; xr-spatial-tracking" xr-spatial-tracking execution-while-out-of-viewport execution-while-not-rendered web-share src="https://sketchfab.com/models/55b5426840fd45f19f19efdb4293f986/embed?ui_theme=dark&dnt=1"> </iframe> </div>
+
+<script>
+
+// 🔹 YOUR FIREBASE CONFIG
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_AUTH_DOMAIN",
+  databaseURL: "YOUR_DATABASEURL",
+  projectId: "YOUR_PROJECT_ID",
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+let water = 0;
+let rain = 0;
+let temp = 0;
+let hum = 0;
+
+// 🔹 Listen to sensor data
+db.ref("/waterLevel").on("value", (snapshot)=>{
+  water = snapshot.val() || 0;
+  document.getElementById("water").innerText = water;
+  calculateAI();
+});
+
+db.ref("/rain").on("value", (snapshot)=>{
+  rain = snapshot.val() || 0;
+  document.getElementById("rain").innerText = rain;
+  calculateAI();
+});
+
+db.ref("/temperature").on("value", (snapshot)=>{
+  temp = snapshot.val() || 0;
+  document.getElementById("temp").innerText = temp;
+});
+
+db.ref("/humidity").on("value", (snapshot)=>{
+  hum = snapshot.val() || 0;
+  document.getElementById("hum").innerText = hum;
+});
+
+// 🔹 AI Prediction Function
+function calculateAI(){
+
+  // Simple intelligent weighted formula
+  let risk = 0;
+
+  if(rain == 1) risk += 30;
+  if(water > 1000) risk += 30;
+  if(water > 2000) risk += 20;
+  if(hum > 80) risk += 10;
+  if(temp < 20) risk += 10;
+
+  if(risk > 100) risk = 100;
+
+  document.getElementById("risk").innerText = risk;
+
+  // Update Firebase automatically
+  db.ref("/AI_Flood_Risk").set(risk);
+
+  // Status Display
+  if(risk > 70){
+    document.getElementById("status").innerHTML = "Status: HIGH RISK";
+    document.getElementById("status").className = "alert";
+  }
+  else{
+    document.getElementById("status").innerHTML = "Status: SAFE";
+    document.getElementById("status").className = "safe";
+  }
+}
+
+</script>
+
+</body>
+</html>
